@@ -5,6 +5,8 @@ import { base64encode, base64decode } from 'nodejs-base64';
 import Moralis from "moralis";
 import Web3 from "web3/dist/web3.min.js";
 import { contractABI, contractAddress } from "../contract.js";
+import axios from 'axios';
+import "./minter.css";
 
 const Buffer = require('buffer/').Buffer;
 
@@ -30,8 +32,6 @@ function Minter(){
 
       // generate metadata and save to ipfs
       const metadata = {
-        name,
-        description,
         image: file1url,
       };
       const file2 = new Moralis.File(`metadata.json`, {
@@ -50,6 +50,23 @@ function Minter(){
         .send({ from: user.get("ethAddress") });
       const tokenId = response.events.Transfer.returnValues.tokenId;
 
+      var date = new Date();
+      const date_string = date.toISOString().substr(0,10);
+      axios.post("http://localhost:8080/upload", 
+      {
+        url : file1url,
+        date : date_string
+      },{})
+        .then(function (response) {
+          console.log("response = " + response.data);
+          alert("Submitted Successfully!")
+        })
+        .catch(function (error) {
+          console.log(error);
+          alert("Something else went wrong.")
+        });
+
+
       alert(
         `NFT successfully minted. Contract address - ${contractAddress} and Token ID - ${tokenId}`
       );
@@ -60,34 +77,16 @@ function Minter(){
     }
     return(
         <div>
-            <button 
-                className = "border-[1px] p-2 text-lg border-black"
-                onClick={() => logout()}>Log Out
-            </button>
-            <div className="flex w-screen h-screen items-center justify-center">
+            <div className="chooseFile">
                 
                 <form onSubmit={(e) => handleSubmit(e)}>
-                    <input 
-                        type="text" 
-                        className="border-[1px] p-2 text-lg border-black w-full" 
-                        placeholder="Name"
-                        value = {name} 
-                        onChange = {(e) => setName(e.target.value) }
-                    />
-                    <input 
-                        type="text" 
-                        className="border-[1px] p-2 text-lg border-black w-full" 
-                        placeholder="Description"
-                        value = {description} 
-                        onChange = {(e) => setDescription(e.target.value) }
-                    />
                     <input 
                         type="file" 
                         className="border-[1px] p-2 text-lg border-black w-full" 
                         onChange = {(e) => setFile(e.target.files[0])}/>
                     <button 
                         type="submit" 
-                        className="border-[1px] p-2 text-lg border-black w-full"
+                        className="uploadButton"
                     >
                         Mint
                     </button>

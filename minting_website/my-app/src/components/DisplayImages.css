@@ -1,0 +1,14 @@
+.DisplayImages {
+    position: relative;
+    max-height: 200px;
+    justify-content: center;
+
+}
+
+.title {
+    font-size: 32px;
+    text-align: center;
+    align-self: center;
+    cursor: default;
+    color: #1A3263;
+}
